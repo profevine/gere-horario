@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  /* Forçando cores tradicionais para compatibilidade com html2canvas */
+  --color-school-green-light: #e8f5e9;
+  --color-school-green-default: #2e7d32;
+  --color-school-green-dark: #1b5e20;
+  --color-school-gold-light: #fffde7;
+  --color-school-gold-default: #fbc02d;
+  --color-school-gold-dark: #f9a825;
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  /* Desativando oklch globalmente para o html2canvas */
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f1f8e9;
+}
+
+#root {
+  width: 100%;
+}
