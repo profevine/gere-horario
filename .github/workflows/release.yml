@@ -1,0 +1,46 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Get version
+        id: version
+        run: echo "tag=v$(date -u +'%Y.%m.%d-%H%M')" >> "$GITHUB_OUTPUT"
+
+      - name: Rename output
+        run: mv dist/index.html dist/Horario_Achilino.html
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: "Horário ${{ steps.version.outputs.tag }}"
+          body: |
+            ## Como usar
+            1. Baixe o arquivo `Horario_Achilino.html` abaixo
+            2. Dê duplo clique para abrir no navegador
+            3. Nenhuma instalação necessária
+          files: dist/Horario_Achilino.html
+          token: ${{ secrets.GITHUB_TOKEN }}
