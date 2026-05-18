@@ -1,38 +1,34 @@
-import type { Teacher, Subject, SchoolClass, Assignment } from '../types';
-import { useLocalStorage } from './useLocalStorage';
+import { useDB } from './useDB';
+import type { Teacher, Subject, SchoolClass, Assignment, ScheduleEntry } from '../types';
 
 export function useSchoolData() {
-  const [teachers, setTeachers] = useLocalStorage<Teacher[]>('teachers', []);
-  const [subjects, setSubjects] = useLocalStorage<Subject[]>('subjects', []);
-  const [classes, setClasses] = useLocalStorage<SchoolClass[]>('classes', []);
-  const [assignments, setAssignments] = useLocalStorage<Assignment[]>('assignments', []);
-  const [orderedClassIds, setOrderedClassIds] = useLocalStorage<string[]>('orderedClassIds', []);
+  const [teachers, setTeachers, tl] = useDB<Teacher[]>('teachers', []);
+  const [subjects, setSubjects, sl] = useDB<Subject[]>('subjects', []);
+  const [classes, setClasses, cl] = useDB<SchoolClass[]>('classes', []);
+  const [assignments, setAssignments, al] = useDB<Assignment[]>('assignments', []);
+  const [orderedClassIds, setOrderedClassIds, ol] = useDB<string[]>('orderedClassIds', []);
+  const [schedule, setSchedule, scl] = useDB<ScheduleEntry[]>('schedule', []);
 
-  const addTeacher = (name: string) => {
-    const newTeacher = { id: crypto.randomUUID(), name };
-    setTeachers([...teachers, newTeacher]);
-  };
+  const isLoaded = tl && sl && cl && al && ol && scl;
 
-  const addSubject = (name: string, color?: string) => {
-    const newSubject = { id: crypto.randomUUID(), name, color };
-    setSubjects([...subjects, newSubject]);
-  };
+  const addTeacher = (name: string) =>
+    setTeachers(prev => [...prev, { id: crypto.randomUUID(), name }]);
+
+  const addSubject = (name: string) =>
+    setSubjects(prev => [...prev, { id: crypto.randomUUID(), name }]);
 
   const addClass = (name: string) => {
-    const newId = crypto.randomUUID();
-    const newClass = { id: newId, name };
-    setClasses([...classes, newClass]);
-    setOrderedClassIds([...orderedClassIds, newId]);
+    const id = crypto.randomUUID();
+    setClasses(prev => [...prev, { id, name }]);
+    setOrderedClassIds(prev => [...prev, id]);
   };
 
-  const addAssignment = (teacherId: string, subjectId: string, classId: string, lessonsPerWeek: number) => {
-    const newAssignment = { teacherId, subjectId, classId, lessonsPerWeek };
-    setAssignments([...assignments, newAssignment]);
-  };
+  const addAssignment = (teacherId: string, subjectId: string, classId: string, lessonsPerWeek: number) =>
+    setAssignments(prev => [...prev, { teacherId, subjectId, classId, lessonsPerWeek }]);
 
   return {
-    teachers, subjects, classes, assignments, orderedClassIds,
+    teachers, subjects, classes, assignments, orderedClassIds, schedule, isLoaded,
     addTeacher, addSubject, addClass, addAssignment,
-    setTeachers, setSubjects, setClasses, setAssignments, setOrderedClassIds
+    setTeachers, setSubjects, setClasses, setAssignments, setOrderedClassIds, setSchedule,
   };
 }
